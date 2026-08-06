@@ -1,0 +1,30 @@
+{
+  "keywords": {
+    "estatistica": [
+      "estatística",
+      "estatístico",
+      "bacharel em estatística",
+      "curso superior em estatística",
+      "graduação em estatística"
+    ],
+    "bonus": [
+      "python",
+      "r",
+      "sql",
+      "machine learning",
+      "ciência de dados",
+      "data science"
+    ]
+  },
+  "scores": {
+    "keyword_match": 50,
+    "bonus_match": 10,
+    "salary_high": 20,
+    "city_priority": 5,
+    "org_priority": 20
+  },
+  "priorities": {
+    "cities": ["Brasília", "São Paulo", "Rio de Janeiro"],
+    "orgs": ["IBGE", "IPEA", "BACEN", "CVM"]
+  }
+}
