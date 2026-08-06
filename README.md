@@ -10,6 +10,8 @@ MVP de um sistema automatizado para monitorar concursos públicos brasileiros vo
 - `scrapers/`: Módulos de raspagem para PCI Concursos, Folha Dirigida e DOU.
 - `parser/`: Lógica de pontuação baseada em palavras-chave.
 - `notifier/`: Sistema de notificações (E-mail e log).
+- `dashboard/app.py`: Painel interativo em Streamlit para visualização dos dados.
+- `logs/`: Logs diários detalhados da execução.
 - `keywords.json`: Lista customizável de termos e pesos.
 
 ## Como Usar
@@ -28,6 +30,11 @@ MVP de um sistema automatizado para monitorar concursos públicos brasileiros vo
 3. **Execute o script**:
    ```bash
    python main.py
+   ```
+
+4. **Abra o Dashboard**:
+   ```bash
+   streamlit run dashboard/app.py
    ```
 
 ## Lógica de Pontuação

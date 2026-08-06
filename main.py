@@ -9,66 +9,79 @@ import logging
 import os
 
 # Setup Logging
-logging.basicConfig(
-    filename='logs/app.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+from datetime import datetime
+log_filename = f"logs/{datetime.now().strftime('%Y-%m-%d')}.log"
+os.makedirs("logs", exist_ok=True)
+
+# Custom logger to print and save to file
+logger = logging.getLogger("ConcursoRadar")
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s | %(message)s', datefmt='%H:%M')
+
+file_handler = logging.FileHandler(log_filename, encoding='utf-8')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+def log_step(msg, success=True):
+    symbol = "✔" if success else "✖"
+    logger.info(f"{symbol} {msg}")
+    print(f"{symbol} {msg}")
 
 def main():
-    print("🚀 Iniciando Concurso Radar...")
-    logging.info("Iniciando execução do Concurso Radar")
+    logger.info("--- INÍCIO DA EXECUÇÃO ---")
     
     db = Database()
     matcher = KeywordMatcher()
     notifier = EmailNotifier()
     
     scrapers = [
-        PCIScraper(),
-        FolhaScraper(),
-        DOUScraper()
+        (PCIScraper(), "PCI Concursos"),
+        (FolhaScraper(), "Folha Dirigida"),
+        (DOUScraper(), "DOU")
     ]
     
     all_contests = []
     
-    for scraper in scrapers:
-        name = scraper.__class__.__name__
-        print(f"🔍 Buscando em {name}...")
+    for scraper_obj, name in scrapers:
+        logger.info(f"{name} iniciado")
         try:
-            found = scraper.fetch_latest()
-            print(f"✅ Encontrados {len(found)} itens em {name}")
+            found = scraper_obj.fetch_latest()
+            log_step(f"{len(found)} concursos encontrados em {name}")
             all_contests.extend(found)
         except Exception as e:
-            print(f"❌ Erro em {name}: {e}")
-            logging.error(f"Erro no scraper {name}: {e}")
+            log_step(f"Erro no scraper {name}: {e}", success=False)
 
-    new_matches = 0
+    logger.info("Parser iniciado")
+    new_matches_list = []
     for contest in all_contests:
-        # Calculate score
         score = matcher.calculate_score(contest)
         contest['score'] = score
-        
         if score > 0:
-            # Try to insert into DB (link is unique)
-            is_new = db.insert_concurso(contest)
-            if is_new:
-                new_matches += 1
-                print(f"✨ Novo match! {contest['orgao']} - Score: {score}")
-                logging.info(f"Novo match: {contest['orgao']} - Link: {contest['link']}")
+            new_matches_list.append(contest)
+    
+    log_step(f"{len(new_matches_list)} concursos compatíveis encontrados pelo Parser")
 
-    # Notify about new matches
+    logger.info("Banco de dados atualizado")
+    new_inserted = 0
+    for contest in new_matches_list:
+        if db.insert_concurso(contest):
+            new_inserted += 1
+    
+    log_step(f"{new_inserted} novos concursos salvos no banco")
+
     unnotified = db.get_unnotified()
     if unnotified:
-        print(f"📧 Enviando {len(unnotified)} notificações...")
+        logger.info("Email iniciado")
         for row in unnotified:
             contest_dict = dict(row)
-            success = notifier.send_notification(contest_dict)
-            # Even if email fails (due to credentials), we mark as notified in this MVP 
-            # to avoid spamming the logs, but the user can check the logs.
+            notifier.send_notification(contest_dict)
             db.mark_as_notified(contest_dict['id'])
+        log_step(f"{len(unnotified)} e-mails de notificação processados")
+    else:
+        logger.info("Nenhuma nova notificação pendente")
             
-    print(f"🏁 Fim da execução. {new_matches} novos concursos encontrados.")
-    logging.info(f"Execução finalizada. Novos matches: {new_matches}")
+    log_step("Fim da execução")
+    logger.info("--- FIM ---")
 
 if __name__ == "__main__":
     main()

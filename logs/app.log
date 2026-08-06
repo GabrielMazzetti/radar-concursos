@@ -1,0 +1,10 @@
+2026-08-06 04:10:21,750 - INFO - Iniciando execução do Concurso Radar
+2026-08-06 04:13:21,080 - INFO - Iniciando execução do Concurso Radar
+2026-08-06 04:13:43,435 - ERROR - Erro no scraper DOUScraper: HTTPSConnectionPool(host='www.in.gov.br', port=443): Read timed out. (read timeout=15)
+2026-08-06 04:13:43,436 - INFO - Execução finalizada. Novos matches: 0
+2026-08-06 04:13:50,316 - INFO - Iniciando execução do Concurso Radar
+2026-08-06 04:14:11,236 - ERROR - Erro no scraper DOUScraper: HTTPSConnectionPool(host='www.in.gov.br', port=443): Read timed out. (read timeout=15)
+2026-08-06 04:14:11,238 - INFO - Novo match: IBGE - Link: https://example.com/ibge-estatistico
+2026-08-06 04:14:11,240 - INFO - Execução finalizada. Novos matches: 1
+2026-08-06 04:15:28,247 - ERROR - Erro no scraper DOUScraper: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-08-06 04:15:28,248 - INFO - Execução finalizada. Novos matches: 0
